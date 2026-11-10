@@ -330,22 +330,51 @@ no te escribo para reclamar nada. Vos sabés lo mucho que te quiero y sigue sien
 
   <button class="music" id="music" aria-label="Pausar o reanudar la música" title="música">♪</button>
 
-  <audio id="song" src="assets/cancion.mp3" loop preload="auto"></audio>
+  <div id="yt-host" aria-hidden="true" style="position:fixed; width:1px; height:1px; overflow:hidden; opacity:0.001; pointer-events:none; left:-10px; top:-10px;"></div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
 (function () {
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var body = document.body;
-  var song = document.getElementById("song");
   var musicBtn = document.getElementById("music");
   var started = false;
+  var ytReady = false;
+  var ytPending = false;
+  var player = null;
+
+  window.onYouTubeIframeAPIReady = function () {
+    player = new YT.Player("yt-host", {
+      videoId: "iwpEkK5qU58",
+      playerVars: { loop: 1, playlist: "iwpEkK5qU58", playsinline: 1, rel: 0 },
+      events: {
+        onReady: function () {
+          ytReady = true;
+          if (ytPending) playSong();
+        },
+        onStateChange: function (e) {
+          if (e.data === YT.PlayerState.ENDED) {
+            player.seekTo(0);
+            player.playVideo();
+          }
+        }
+      }
+    });
+  };
+
+  function playSong() {
+    if (!ytReady) { ytPending = true; return; }
+    player.setVolume(40);
+    player.playVideo();
+    musicBtn.classList.remove("muted");
+  }
 
   function open() {
     if (started) return;
     started = true;
     body.classList.add("open");
-    song.volume = 0.35;
-    song.play().catch(function () { musicBtn.classList.add("muted"); });
+    playSong();
     if (reduce) document.getElementById("intro").remove();
   }
 
@@ -371,12 +400,13 @@ no te escribo para reclamar nada. Vos sabés lo mucho que te quiero y sigue sien
   }
 
   musicBtn.addEventListener("click", function () {
-    if (song.paused) {
-      song.play().catch(function () {});
-      musicBtn.classList.remove("muted");
-    } else {
-      song.pause();
+    if (!ytReady) { playSong(); return; }
+    if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+      player.pauseVideo();
       musicBtn.classList.add("muted");
+    } else {
+      player.playVideo();
+      musicBtn.classList.remove("muted");
     }
   });
 })();
