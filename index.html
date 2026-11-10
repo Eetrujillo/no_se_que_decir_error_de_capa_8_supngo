@@ -15,6 +15,9 @@
     --ink-soft: #a3888e;
     --line: #ecd8db;
     --accent: #d98a9c;
+    --petal-1: #f6dfe3;
+    --petal-2: #f0d3d9;
+    --petal-3: #e9c6ce;
     --dur-in: 900ms;
     --stagger: 140ms;
   }
@@ -36,9 +39,48 @@
     display: flex;
     justify-content: center;
     padding: clamp(2rem, 6vh, 5rem) 1.25rem;
+    overflow-x: hidden;
   }
 
+  /* ---- layered scene: capa 8 (the layer nobody talks about) ---- */
+
+  .scene {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .layer {
+    position: absolute;
+    inset: -5%;
+    transition: transform 600ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .petal {
+    position: absolute;
+    width: 14px;
+    height: 18px;
+    background: var(--petal-2);
+    border-radius: 70% 30% 65% 35% / 60% 40% 60% 40%;
+    opacity: 0.55;
+    animation: drift linear infinite;
+  }
+
+  .far  .petal { background: var(--petal-1); transform: scale(0.7); filter: blur(1.5px); opacity: 0.4; animation-duration: 26s; }
+  .mid  .petal { animation-duration: 19s; }
+  .near .petal { background: var(--petal-3); transform: scale(1.25); filter: blur(0.4px); opacity: 0.5; animation-duration: 14s; }
+
+  @keyframes drift {
+    0%   { translate: 0 -8vh; rotate: 0deg; }
+    100% { translate: 6vw 108vh; rotate: 300deg; }
+  }
+
+  /* ---- letter ---- */
+
   .letter {
+    position: relative;
+    z-index: 1;
     max-width: 40rem;
     width: 100%;
     background: var(--paper);
@@ -73,44 +115,271 @@
     text-align: justify;
     hyphens: auto;
     opacity: 0;
+  }
+
+  body.open .letter p {
     transform: translateY(14px);
     animation: rise var(--dur-in) cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-    animation-delay: calc(var(--i) * var(--stagger) + 300ms);
+    animation-delay: calc(var(--i) * var(--stagger) + 400ms);
   }
 
   .letter p:last-child { margin-bottom: 0; }
 
-  .salutation {
-    font-style: italic;
-    color: var(--ink-soft);
+  .salutation { font-style: italic; color: var(--ink-soft); }
+
+  /* ---- easter egg: error 404, de capa 8 ---- */
+
+  .egg { position: relative; cursor: help; }
+
+  .egg .tag {
+    position: absolute;
+    left: 50%;
+    top: -0.4em;
+    translate: -50% -100%;
+    font-size: 0.62em;
+    font-style: normal;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.15em 0.9em;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 400ms ease, translate 400ms ease;
   }
 
+  .egg:hover .tag {
+    opacity: 1;
+    translate: -50% -130%;
+  }
 
   @keyframes rise {
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* ---- envelope intro ---- */
+
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 800ms ease 600ms;
+  }
+
+  body.open .intro {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .envelope {
+    position: relative;
+    width: min(320px, 78vw);
+    aspect-ratio: 3 / 2;
+  }
+
+  .env-body {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: 0 18px 50px rgba(122, 92, 98, 0.12);
+  }
+
+  .env-flap {
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 52%;
+    background: var(--petal-1);
+    border: 1px solid var(--line);
+    border-radius: 6px 6px 0 0;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top;
+    transition: transform 700ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    z-index: 2;
+  }
+
+  .env-seal {
+    position: absolute;
+    left: 50%; top: 48%;
+    translate: -50% -50%;
+    width: 52px; height: 52px;
+    background: var(--accent);
+    color: var(--paper);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 14px rgba(217, 138, 156, 0.45);
+    z-index: 3;
+    transition: opacity 300ms ease, scale 300ms ease;
+  }
+
+  .intro .hint {
+    position: absolute;
+    bottom: -3.2rem;
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+
+  body.open .env-flap { transform: rotateX(180deg); }
+  body.open .env-seal { opacity: 0; scale: 1.4; }
+  body.open .envelope { animation: envelope-away 700ms ease 500ms forwards; }
+
+  @keyframes envelope-away {
+    to { opacity: 0; translate: 0 6vh; }
+  }
+
+  /* ---- music toggle ---- */
+
+  .music {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 5;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--accent);
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 600ms ease 1.6s, box-shadow 200ms ease;
+  }
+
+  body.open .music { opacity: 1; pointer-events: auto; }
+
+  .music:hover { box-shadow: 0 4px 14px rgba(217, 138, 156, 0.3); }
+  .music.muted { color: var(--ink-soft); }
+
+  /* ---- reduced motion ---- */
+
   @media (prefers-reduced-motion: reduce) {
-    .letter p {
-      animation: none;
-      opacity: 1;
-      transform: none;
-    }
+    .petal { animation: none; opacity: 0.25; }
+    .intro { display: none; }
+    .letter p { opacity: 1; }
+    body.open .letter p { animation: none; transform: none; }
+    .music { transition: none; }
   }
 </style>
 </head>
 <body>
+
+  <div class="scene" aria-hidden="true">
+    <div class="layer far" data-depth="0.4">
+      <div class="petal" style="left:8%;  animation-delay:-3s"></div>
+      <div class="petal" style="left:34%; animation-delay:-11s"></div>
+      <div class="petal" style="left:57%; animation-delay:-19s"></div>
+      <div class="petal" style="left:82%; animation-delay:-7s"></div>
+    </div>
+    <div class="layer mid" data-depth="1">
+      <div class="petal" style="left:15%; animation-delay:-5s"></div>
+      <div class="petal" style="left:45%; animation-delay:-14s"></div>
+      <div class="petal" style="left:70%; animation-delay:-2s"></div>
+      <div class="petal" style="left:91%; animation-delay:-17s"></div>
+      <div class="petal" style="left:28%; animation-delay:-21s"></div>
+    </div>
+    <div class="layer near" data-depth="2.2">
+      <div class="petal" style="left:5%;  animation-delay:-8s"></div>
+      <div class="petal" style="left:52%; animation-delay:-1s"></div>
+      <div class="petal" style="left:76%; animation-delay:-12s"></div>
+      <div class="petal" style="left:95%; animation-delay:-15s"></div>
+    </div>
+  </div>
+
   <main class="letter">
     <div class="ornament" aria-hidden="true"><span>✿</span></div>
 
     <p class="salutation" style="--i: 0">(Mejor lo escribo por que en persona siempre me quedo a medias. y usted sabe que:
 no soy de escribir cartas y que me va a queda raro.</p>
 
-    <p style="--i: 1">Ya pasaron unos dias de que estemos asi, y aun es raro por que me pasa que sigo aprendiendo cosas y mi cabeza hace que empieza a compilar cómo explicártelo.Y que siempre tira error 404 y de capa 8, porque la mitad de la gracia era que me preguntes ¿y esto para qué sirve? Y no, no me das fastidio, nunca lo dije del todo en serio todavía me gusta escucharte igual que antes.</p>
+    <p style="--i: 1">Ya pasaron unos dias de que estemos asi, y aun es raro por que me pasa que sigo aprendiendo cosas y mi cabeza hace que empieza a compilar cómo explicártelo.Y que siempre tira <span class="egg">error 404 y de capa <span class="tag">404 · capa 8: no encontrada</span></span>8, porque la mitad de la gracia era que me preguntes ¿y esto para qué sirve? Y no, no me das fastidio, nunca lo dije del todo en serio todavía me gusta escucharte igual que antes.</p>
 
-    <p style="--i: 2">Lo curioso es que justo ahora tengo ganas de meternos en cosas juntos, de que aprendas cosas nuevas que te sirvan, de ver qué se nos presentan justo cosas que quiera hacer paso esto y pues sabes que ya no es lo mismo por que ya no compartimos el mismo tiempo juntos y pues claramente no te escribo para reclamar nada. Vos sabés lo mucho que te quiero y sigue siendo desde donde se origino el big bang hasta donde el universo se sigue expandiendo, como te dije el otro día. Pero no se puede decir simplemente, no por decir algo raro, sino porque con vos pasaban cosas que con nadie más: las trasnochadas, escucharte hablar, contarnos todo a las 3 de la mañana. Eso no se borra. Quedó a medio contar, y sabes que a mí las cosas a medias no me gustan y es dificil que se me olviden.</p>
+    <p style="--i: 2">Lo curioso es que justo ahora tengo ganas de meternos en cosas juntos, de que aprendas cosas nuevas que te sirvan, de ver qué se nos presentan justo  cosas que quiera hacer paso esto y pues sabes que ya no es lo mismo por que ya no compartimos el mismo tiempo juntos y pues claramente
+no te escribo para reclamar nada. Vos sabés lo mucho que te quiero y sigue siendo desde donde se origino el big bang hasta donde el universo se sigue expandiendo, como te dije el otro día. Pero no se puede decir simplemente, no por decir algo raro,
+  sino porque con vos pasaban cosas que con nadie más: las trasnochadas, escucharte hablar, contarnos todo a las 3 de la mañana.
+  Eso no se borra. Quedó a medio contar, y sabes que a mí las cosas a medias no me gustan y es dificil que se me olviden.</p>
 
-    <p style="--i: 3">sigo acá, sigo con las ganas de armar cosas con vos, de enseñarte y que me enseñes, de ver qué aparece. Sin apuro y sin pedirte nada. Y si un día te agarran ganas de una trasnochada de esas,me avisá, que yo me anoto siempre, pero cuando no me vayas a abandonar y por ultimo tu sabes que yo siempre estaba esperando a que me llamaras a escuchar tu nueva ocurrencia por que siepre se te ocurria una nueva cosa.)</p>
+    <p style="--i: 3">sigo acá, sigo con las ganas de armar cosas con vos, de enseñarte y que me enseñes, de ver qué
+ aparece. Sin apuro y sin pedirte nada. Y si un día te agarran ganas de una trasnochada de esas,me avisá, que yo me anoto
+ siempre, pero cuando no me vayas a abandonar y por ultimo tu sabes que yo siempre estaba esperando a que me llamaras a escuchar tu nueva ocurrencia por que siepre se te ocurria una nueva cosa.)</p>
   </main>
+
+  <div class="intro" id="intro" role="button" aria-label="Abrir la carta">
+    <div class="envelope">
+      <div class="env-body"></div>
+      <div class="env-flap"></div>
+      <div class="env-seal">✿</div>
+      <div class="hint">tocá para abrir</div>
+    </div>
+  </div>
+
+  <button class="music" id="music" aria-label="Pausar o reanudar la música" title="música">♪</button>
+
+  <audio id="song" src="assets/cancion.mp3" loop preload="auto"></audio>
+
+<script>
+(function () {
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var body = document.body;
+  var song = document.getElementById("song");
+  var musicBtn = document.getElementById("music");
+  var started = false;
+
+  function open() {
+    if (started) return;
+    started = true;
+    body.classList.add("open");
+    song.volume = 0.35;
+    song.play().catch(function () { musicBtn.classList.add("muted"); });
+    if (reduce) document.getElementById("intro").remove();
+  }
+
+  document.getElementById("intro").addEventListener("click", open);
+  if (reduce) open();
+
+  // gentle parallax on the petal layers
+  if (!reduce) {
+    var layers = document.querySelectorAll(".layer");
+    var raf = null;
+    window.addEventListener("mousemove", function (e) {
+      if (raf) return;
+      raf = requestAnimationFrame(function () {
+        var x = e.clientX / window.innerWidth - 0.5;
+        var y = e.clientY / window.innerHeight - 0.5;
+        layers.forEach(function (l) {
+          var d = parseFloat(l.dataset.depth) * 14;
+          l.style.transform = "translate(" + (-x * d) + "px, " + (-y * d) + "px)";
+        });
+        raf = null;
+      });
+    });
+  }
+
+  musicBtn.addEventListener("click", function () {
+    if (song.paused) {
+      song.play().catch(function () {});
+      musicBtn.classList.remove("muted");
+    } else {
+      song.pause();
+      musicBtn.classList.add("muted");
+    }
+  });
+})();
+</script>
 </body>
 </html>
