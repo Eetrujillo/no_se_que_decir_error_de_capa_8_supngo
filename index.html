@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Una carta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf3f3;
+    --paper: #fff9f9;
+    --ink: #7a5c62;
+    --ink-soft: #a3888e;
+    --line: #ecd8db;
+    --accent: #d98a9c;
+    --dur-in: 900ms;
+    --stagger: 140ms;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, #fbe9ec 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 85% 110%, #f9e4e9 0%, transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: clamp(1.15rem, 1rem + 0.6vw, 1.45rem);
+    line-height: 1.85;
+    display: flex;
+    justify-content: center;
+    padding: clamp(2rem, 6vh, 5rem) 1.25rem;
+  }
+
+  .letter {
+    max-width: 40rem;
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow:
+      0 1px 2px rgba(122, 92, 98, 0.04),
+      0 12px 40px rgba(122, 92, 98, 0.07);
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.75rem, 5vw, 4rem);
+  }
+
+  .ornament {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--accent);
+    margin-bottom: clamp(2rem, 5vh, 3.25rem);
+  }
+
+  .ornament::before,
+  .ornament::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .ornament span { font-size: 1.1rem; letter-spacing: 0.35em; padding-left: 0.35em; }
+
+  .letter p {
+    margin-bottom: 1.6em;
+    text-align: justify;
+    hyphens: auto;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: rise var(--dur-in) cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    animation-delay: calc(var(--i) * var(--stagger) + 300ms);
+  }
+
+  .letter p:last-child { margin-bottom: 0; }
+
+  .salutation {
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .letter p {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="letter">
+    <div class="ornament" aria-hidden="true"><span>✿</span></div>
+
+    <p class="salutation" style="--i: 0">(Mejor lo escribo por que en persona siempre me quedo a medias. y usted sabe que:
+no soy de escribir cartas y que me va a queda raro.</p>
+
+    <p style="--i: 1">Ya pasaron unos dias de que estemos asi, y aun es raro por que me pasa que sigo aprendiendo cosas y mi cabeza hace que empieza a compilar cómo explicártelo.Y que siempre tira error 404 y de capa 8, porque la mitad de la gracia era que me preguntes ¿y esto para qué sirve? Y no, no me das fastidio, nunca lo dije del todo en serio todavía me gusta escucharte igual que antes.</p>
+
+    <p style="--i: 2">Lo curioso es que justo ahora tengo ganas de meternos en cosas juntos, de que aprendas cosas nuevas que te sirvan, de ver qué se nos presentan justo cosas que quiera hacer paso esto y pues sabes que ya no es lo mismo por que ya no compartimos el mismo tiempo juntos y pues claramente no te escribo para reclamar nada. Vos sabés lo mucho que te quiero y sigue siendo desde donde se origino el big bang hasta donde el universo se sigue expandiendo, como te dije el otro día. Pero no se puede decir simplemente, no por decir algo raro, sino porque con vos pasaban cosas que con nadie más: las trasnochadas, escucharte hablar, contarnos todo a las 3 de la mañana. Eso no se borra. Quedó a medio contar, y sabes que a mí las cosas a medias no me gustan y es dificil que se me olviden.</p>
+
+    <p style="--i: 3">sigo acá, sigo con las ganas de armar cosas con vos, de enseñarte y que me enseñes, de ver qué aparece. Sin apuro y sin pedirte nada. Y si un día te agarran ganas de una trasnochada de esas,me avisá, que yo me anoto siempre, pero cuando no me vayas a abandonar y por ultimo tu sabes que yo siempre estaba esperando a que me llamaras a escuchar tu nueva ocurrencia por que siepre se te ocurria una nueva cosa.)</p>
+  </main>
+</body>
+</html>
