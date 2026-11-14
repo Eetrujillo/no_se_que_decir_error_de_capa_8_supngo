@@ -7,7 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-<style>
+<script>
+    (function () {
+      var h = new Date().getHours();
+      if (h >= 21 || h < 6) document.documentElement.classList.add("night");
+    })();
+  </script>
+  <style>
   :root {
     --bg: #faf3f3;
     --paper: #fff9f9;
@@ -188,7 +194,7 @@
     opacity: 0;
   }
 
-  body.open .letter p {
+  body.open .letter.is-shown p {
     transform: translateY(14px);
     animation: rise var(--dur-in) cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
     animation-delay: calc(var(--i) * var(--stagger) + 400ms);
@@ -412,11 +418,11 @@
     stroke-dashoffset: 320;
   }
 
-  body.open .flor path { animation: draw 2.4s ease forwards; }
-  body.open .flor path:nth-of-type(2) { animation-delay: 0.7s; }
-  body.open .flor path:nth-of-type(3) { animation-delay: 1.2s; }
-  body.open .flor path:nth-of-type(4) { animation-delay: 1.6s; }
-  body.open .flor path:nth-of-type(5) { animation-delay: 1.9s; }
+  body.open .letter.is-shown .flor path { animation: draw 2.4s ease forwards; }
+  body.open .letter.is-shown .flor path:nth-of-type(2) { animation-delay: 0.7s; }
+  body.open .letter.is-shown .flor path:nth-of-type(3) { animation-delay: 1.2s; }
+  body.open .letter.is-shown .flor path:nth-of-type(4) { animation-delay: 1.6s; }
+  body.open .letter.is-shown .flor path:nth-of-type(5) { animation-delay: 1.9s; }
 
   .flor .heart {
     fill: var(--accent);
@@ -426,13 +432,89 @@
     transform-origin: 60px 150px;
   }
 
-  body.open .flor .heart { animation: heart-in 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 3s forwards, heartbeat 1.8s ease-in-out 3.8s infinite; }
+  body.open .letter.is-shown .flor .heart { animation: heart-in 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 3s forwards, heartbeat 1.8s ease-in-out 3.8s infinite; }
 
   @keyframes heart-in {
     to { opacity: 0.85; scale: 1; }
   }
 
   @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  /* ---- modo noche: de 21 a 6 la carta cambia de piel ---- */
+
+  html.night body {
+    --bg: #17101a;
+    --paper: #211826;
+    --ink: #ecd9e2;
+    --ink-soft: #b596a6;
+    --line: #3a2b38;
+    --accent: #e79ab8;
+    --petal-1: #4a3550;
+    --petal-2: #6b4a63;
+    --petal-3: #3b2a44;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -12%, #2b1c2e 0%, transparent 62%),
+      radial-gradient(ellipse 60% 40% at 86% 106%, #241726 0%, transparent 58%),
+      var(--bg);
+    transition: background 700ms ease, color 700ms ease;
+  }
+
+  html.night body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(circle at 82% 5%, rgba(255, 246, 250, 0.16) 0%, rgba(255, 246, 250, 0.05) 16%, transparent 44%);
+  }
+
+  html.night .orb-1 { background: radial-gradient(circle, #3b2444 0%, transparent 70%); }
+  html.night .orb-2 { background: radial-gradient(circle, #2e1c3c 0%, transparent 70%); }
+  html.night .orb-3 { background: radial-gradient(circle, #46294d 0%, transparent 70%); }
+
+  html.night .petal { background: #f6e8f1; opacity: 0.32; }
+  html.night .spark { background: #fff2f8; box-shadow: 0 0 10px 2px rgba(255, 242, 248, 0.5); }
+
+  html.night .letter {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.35),
+      0 16px 52px rgba(0, 0, 0, 0.5),
+      0 0 0 6px rgba(255, 255, 255, 0.04);
+  }
+
+  html.night .egg .tag { background: #211826; }
+  html.night .next { background: rgba(255, 255, 255, 0.05); }
+  html.night .intro { filter: brightness(0.5) saturate(0.7); }
+  html.night .music { color: var(--ink-soft); }
+
+  /* ---- la frase que se escribe sola ---- */
+
+  .quote {
+    margin: 3rem auto 2.6rem;
+    max-width: 24ch;
+    font-size: clamp(1.75rem, 1.1rem + 2.6vw, 2.6rem);
+    line-height: 1.2;
+    font-style: italic;
+    text-align: center;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+    opacity: 0;
+    min-height: 2.4em;
+  }
+  body.open .letter.is-shown .quote {
+    opacity: 1;
+    transition: opacity 400ms ease 900ms;
+  }
+  .quote .caret {
+    display: inline-block;
+    width: 2px;
+    height: 0.95em;
+    margin-left: 3px;
+    vertical-align: -0.08em;
+    background: currentColor;
+    animation: blink 900ms steps(1, end) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
 
   /* ---- reduced motion ---- */
 
@@ -447,6 +529,50 @@
     body.open .letter p { animation: none; transform: none; }
     .music { transition: none; animation: none; }
     .flor path, .flor .heart { stroke-dashoffset: 0; animation: none; opacity: 1; scale: 1; }
+    .quote { opacity: 1; transition: none; }
+    .quote .caret { display: none; }
+  }
+  .letter[hidden] { display: none !important; }
+
+  .letter p.pd {
+    margin: 1.8rem 0 0;
+    font-size: 0.8rem;
+    font-style: italic;
+    letter-spacing: 0.05em;
+    text-align: center;
+    color: var(--ink-soft);
+    hyphens: manual;
+  }
+
+  .next {
+    display: block;
+    width: fit-content;
+    margin: 2.2rem auto 0;
+    padding: 0.8rem 1.6rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 22px rgba(217, 138, 156, 0.18);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 700ms ease, transform 700ms ease, color 200ms ease, background 200ms ease, box-shadow 200ms ease;
+  }
+  body.open .letter.is-shown .next {
+    opacity: 1;
+    transform: none;
+    transition-delay: 1500ms;
+  }
+  .next:hover,
+  .next:focus-visible {
+    color: #fff;
+    background: var(--accent);
+    box-shadow: 0 10px 26px rgba(217, 138, 156, 0.35);
   }
 </style>
 </head>
@@ -486,13 +612,13 @@
     </div>
   </div>
 
-  <main class="letter">
+  <main class="letter" id="pagina-1">
     <div class="ornament" aria-hidden="true"><span>✿</span></div>
 
-    <p class="salutation" style="--i: 0">(Mejor lo escribo por que en persona siempre me quedo a medias. y usted sabe que:
-no soy de escribir cartas y que me va a queda raro.</p>
+    <p class="salutation" style="--i: 0">(Mejor lo escribo porque en persona siempre me quedo a medias. y usted sabe que:
+no soy de escribir cartas y que me va a quedar raro.</p>
 
-    <p style="--i: 1">Ya pasaron unos dias de que estemos asi, y aun es raro por que me pasa que sigo aprendiendo cosas y mi cabeza hace que empieza a compilar cómo explicártelo.Y que siempre tira <span class="egg">error 404 y de capa <span class="tag">404 · capa 8: no encontrada</span></span>8, porque la mitad de la gracia era que me preguntes ¿y esto para qué sirve? Y no, no me das fastidio, nunca lo dije del todo en serio todavía me gusta escucharte igual que antes.</p>
+    <p style="--i: 1">Ya pasaron unos dias de que estemos asi, y aun es raro porque me pasa que sigo aprendiendo cosas y mi cabeza hace que empieza a compilar cómo explicártelo. Y que siempre tira <span class="egg">error 404 y de capa <span class="tag">404 · capa 8: no encontrada</span></span>8, porque la mitad de la gracia era que me preguntes ¿y esto para qué sirve? Y no, no me das fastidio, nunca lo dije del todo en serio todavía me gusta escucharte igual que antes.</p>
 
     <p style="--i: 2">Lo curioso es que justo ahora tengo ganas de meternos en cosas juntos, de que aprendas cosas nuevas que te sirvan, de ver qué se nos presentan justo  cosas que quiera hacer paso esto y pues sabes que ya no es lo mismo por que ya no compartimos el mismo tiempo juntos y pues claramente
 no te escribo para reclamar nada. Vos sabés lo mucho que te quiero y sigue siendo desde donde se origino el big bang hasta donde el universo se sigue expandiendo, como te dije el otro día. Pero no se puede decir simplemente, no por decir algo raro,
@@ -500,8 +626,10 @@ no te escribo para reclamar nada. Vos sabés lo mucho que te quiero y sigue sien
   Eso no se borra. Quedó a medio contar, y sabes que a mí las cosas a medias no me gustan y es dificil que se me olviden.</p>
 
     <p style="--i: 3">sigo acá, sigo con las ganas de armar cosas con vos, de enseñarte y que me enseñes, de ver qué
- aparece. Sin apuro y sin pedirte nada. Y si un día te agarran ganas de una trasnochada de esas,me avisá, que yo me anoto
- siempre, pero cuando no me vayas a abandonar y por ultimo tu sabes que yo siempre estaba esperando a que me llamaras a escuchar tu nueva ocurrencia por que siepre se te ocurria una nueva cosa.)</p>
+ aparece. Sin apuro y sin pedirte nada. Y si un día te agarran ganas de una trasnochada de esas, me avisá, que yo me anoto
+ siempre, pero cuando no me vayas a abandonar y por ultimo tu sabes que yo siempre estaba esperando a que me llamaras a escuchar tu nueva ocurrencia porque siempre se te ocurria una nueva cosa.)</p>
+
+    <a class="next" href="#pagina-2" data-goto="pagina-2">todavía hay algo más</a>
 
     <svg class="flor" viewBox="0 0 120 170" aria-hidden="true">
       <path d="M62 165 C 58 130, 64 100, 60 68"/>
@@ -511,6 +639,43 @@ no te escribo para reclamar nada. Vos sabés lo mucho que te quiero y sigue sien
       <path d="M52 30 C 48 22, 50 14, 56 10"/>
       <path class="heart" d="M60 156 C 52 148, 47 143, 47 138 C 47 134, 50 132, 53 132 C 56 132, 59 134, 60 137 C 61 134, 64 132, 67 132 C 70 132, 73 134, 73 138 C 73 143, 68 148, 60 156 Z"/>
     </svg>
+  </main>
+
+  <main class="letter" id="pagina-2" hidden>
+    <div class="ornament" aria-hidden="true"><span>✿</span></div>
+
+    <p class="salutation" style="--i: 0">Hola. Sé que volver a caer con esto es lo último que necesitás, pero necesito soltarlo, y antes de todo lo demás quiero que sepas que siempre te voy a querer mucho.</p>
+
+    <p style="--i: 1">Hay algo que me está pasando y lo voy a decir aunque ya lo sabés, porque no puedo estar así. Volví a caer en lo mismo y no quería. Quería seguir siendo tu amigo, el de siempre, el que te decía "yo resuelvo" o "ya sé". Pero hay un lado mío que no conocía: el lado que simplemente me dice que hay algo que no cuadra, algo que no puedo manejar, y por eso lo de tratar de concentrarme en algo. Pero supongo que lo que siempre no va a cuadrar es que salga alguien, que tenga una ocurrencia, y que aunque no la entienda, siempre tenga algo que decir.</p>
+
+    <p style="--i: 2">Y justo se me cruzaron los pensamientos de cómo nos tratábamos, cuando el problema solo era la variable de cómo prestarte atención: resolver algo en Java y prestar atención en clase, que al final nunca lo vi como un problema porque siempre me gustó hacerlo. Y justo en ese momento quisiera volver atrás, cuando eso era el problema y que eso mejorara, en vez de pasar de un hola mundo a tratar de crear una app mientras recuerdo las cosas por las que sentí cosas por vos, las cosas lindas que pasamos, que son la razón por la cual nunca te voy a odiar.</p>
+
+    <p style="--i: 3">Y aprovecho para disculparme por mis arrebatos, los que me daban y los que me dan, que al final entendías. Lo siento si te hice sentir mal, pero es algo involuntario. Y quiero que sepas que no espero una disculpa de tu parte, porque las cosas que sentí no fueron porque vos me lo pediste, sino por las cosas que compartimos, y por las cuales te agradezco.</p>
+
+    <p style="--i: 4">Y la frase que me dijiste, esa de que sabías que te ibas a equivocar: yo sé que vos también lo sabés, y que aun así lo elegís, y eso es por algo, entonces deja de ser un error. Bueno, al final eso solo lo sabés vos. Y no te lo digo por nada malo, sino porque, como te dije, te quiero mucho y no quiero que sufras.</p>
+
+    <p style="--i: 5">Vos sabés que lo que más te mueve es progresar, así que te lo digo en ese idioma: no te hablo para convencerte de nada, porque es tu decisión. Solo sé una cosa, de las que aprendí acompañándote: el progreso que se hace solo, sin nadie al lado que lo festeje, a veces se queda sin por qué. Y yo lo que ofrezco es lo que ya conocés: alguien que se emociona cuando entendés algo, que sigue tus ideas porque sí y no por obligación, y al que le gusta mirarte arrancar.</p>
+
+    <blockquote class="quote" data-type="siempre te voy a querer mucho" aria-label="siempre te voy a querer mucho"></blockquote>
+
+    <p style="--i: 6">Ya sé. Y lamentablemente lo sé: esta vez quisiera no saber tu respuesta, pero solo quería liberarme, aunque no cambie nada. Y pues, como te dije, quedaron las cosas volando, y era lo último que quería: quería seguir compartiendo cosas con vos, pero de una manera que solo yo me imaginé. Y al final, de una u otra manera, tendré que seguir.</p>
+
+    <p style="--i: 7">Y pues, en fin, es lo que vos ya sabés. Y queda una pregunta, la cual tu sabes. No apunta a algo en concreto, pero vos sabés la respuesta. Si querés me la podés dar, y si no querés, pues no pasa nada: igual siempre va a existir <span class="egg">esa incógnita<span class="tag">404 · capa 8: sigue sin respuesta</span></span>, que no creo que se pueda resolver tan simple.</p>
+
+    <svg class="flor" viewBox="0 0 120 170" aria-hidden="true">
+      <path d="M62 165 C 58 130, 64 100, 60 68"/>
+      <path d="M60 68 C 44 58, 40 40, 52 30 C 60 24, 68 26, 72 34 C 80 26, 94 30, 94 44 C 94 56, 82 64, 60 68"/>
+      <path d="M62 118 C 50 112, 44 104, 50 96 C 56 90, 64 94, 62 104"/>
+      <path d="M72 34 C 72 26, 78 20, 84 22"/>
+      <path d="M52 30 C 48 22, 50 14, 56 10"/>
+      <path class="heart" d="M60 156 C 52 148, 47 143, 47 138 C 47 134, 50 132, 53 132 C 56 132, 59 134, 60 137 C 61 134, 64 132, 67 132 C 70 132, 73 134, 73 138 C 73 143, 68 148, 60 156 Z"/>
+    </svg>
+
+    <p class="pd" style="--i: 8">PD: esto lo escribí a las 3:00 AM, como siempre.</p>
+
+    <a class="next back" href="#pagina-1" data-goto="pagina-1">volver a la primera página</a>
+
+
   </main>
 
   <div class="intro" id="intro" role="button" aria-label="Abrir la carta">
@@ -567,16 +732,71 @@ no te escribo para reclamar nada. Vos sabés lo mucho que te quiero y sigue sien
     }
   }
 
+  var pages = [document.getElementById("pagina-1"), document.getElementById("pagina-2")];
+
+  function showPage(name) {
+    pages.forEach(function (page) {
+      if (!page) return;
+      var target = page.id === name;
+      page.hidden = !target;
+      page.classList.toggle("is-shown", target);
+    });
+    window.scrollTo(0, 0);
+    if (name === "pagina-2") typeQuote();
+  }
+
+  var quote = document.querySelector(".quote");
+
+  function typeQuote() {
+    if (!quote || quote.dataset.typed) return;
+    quote.dataset.typed = "1";
+    var full = quote.getAttribute("data-type") || "";
+    if (reduce) { quote.textContent = full; return; }
+    var i = 0;
+    var caret = document.createElement("span");
+    caret.className = "caret";
+    function step() {
+      i += 1;
+      quote.textContent = full.slice(0, i);
+      quote.appendChild(caret);
+      if (i < full.length) {
+        setTimeout(step, 55 + Math.random() * 40);
+      } else {
+        setTimeout(function () { caret.remove(); }, 1600);
+      }
+    }
+    setTimeout(step, 1000);
+  }
+
+  function route() {
+    showPage(location.hash === "#pagina-2" ? "pagina-2" : "pagina-1");
+  }
+
+  document.querySelectorAll("[data-goto]").forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      var target = link.getAttribute("data-goto");
+      history.pushState(null, "", target === "pagina-1" ? location.pathname : "#" + target);
+      showPage(target);
+      if (target === "pagina-2") burstPetal();
+    });
+  });
+
+  window.addEventListener("popstate", route);
+
   function open() {
     if (started) return;
     started = true;
     body.classList.add("open");
     burstPetal();
     playSong();
-    if (reduce) document.getElementById("intro").remove();
+    var intro = document.getElementById("intro");
+    if (reduce && intro) intro.remove();
+    route();
   }
 
-  document.getElementById("intro").addEventListener("click", open);
+  var introEl = document.getElementById("intro");
+  if (introEl) introEl.addEventListener("click", open);
   if (reduce) open();
 
   // gentle parallax on the petal layers
